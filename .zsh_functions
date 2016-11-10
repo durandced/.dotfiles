@@ -1,0 +1,198 @@
+
+############################################################
+#                      PROMPT SHIT                         #
+############################################################
+ZSH_THEME_GIT_PROMPT_ADDED="%{$fg[cyan]%}+"
+ZSH_THEME_GIT_PROMPT_MODIFIED="%{$fg[yellow]%}✱"
+ZSH_THEME_GIT_PROMPT_DELETED="%{$fg[red]%}✗"
+ZSH_THEME_GIT_PROMPT_RENAMED="%{$fg[blue]%}➦"
+ZSH_THEME_GIT_PROMPT_UNMERGED="%{$fg[magenta]%}✂"
+ZSH_THEME_GIT_PROMPT_UNTRACKED="%{$fg[blue]%}✈"
+ZSH_THEME_GIT_PROMPT_SHA_BEFORE=" %{$fg[blue]%}"
+ZSH_THEME_GIT_PROMPT_SHA_AFTER="%{$reset_color%}"
+
+# svn-fast-info
+ZSH_PROMPT_BASE_COLOR=$CYAN
+ZSH_THEME_BRANCH_NAME_COLOR=$YELLOW
+ZSH_THEME_SVN_PROMPT_PREFIX="svn:("
+ZSH_THEME_SVN_PROMPT_SUFFIX=")"
+ZSH_THEME_SVN_PROMPT_CLEAN=""
+
+# vim:ft=zsh ts=2 sw=2 sts=2 et
+#
+# Faster alternative to the current SVN plugin implementation.
+#
+# Works with svn 1.6, 1.7, 1.8.
+# Use `svn_prompt_info` method to enquire the svn data.
+# It's faster because his efficient use of svn (single svn call) which saves a lot on a huge codebase
+# It displays the current status of the local files (added, deleted, modified, replaced, or else...)
+#
+# Use as a drop-in replacement of the svn plugin not as complementary plugin
+
+function svn_prompt_info() {
+  local info
+  info=$(svn info 2>&1) || return 1; # capture stdout and stderr
+  local repo_need_upgrade=$(svn_repo_need_upgrade $info)
+
+  if [[ -n $repo_need_upgrade ]]; then
+    printf '%s%s%s%s%s%s%s\n' \
+      $ZSH_PROMPT_BASE_COLOR \
+      $ZSH_THEME_SVN_PROMPT_PREFIX \
+      $ZSH_PROMPT_BASE_COLOR \
+      $repo_need_upgrade \
+      $ZSH_PROMPT_BASE_COLOR \
+      $ZSH_THEME_SVN_PROMPT_SUFFIX \
+      $ZSH_PROMPT_BASE_COLOR
+  else
+    printf '%s%s%s%s%s%s%s-%s%s%s%s' \
+	$ZSH_PROMPT_BASE_COLOR \
+	"[" \
+	$ZSH_THEME_BRANCH_NAME_COLOR \
+	$ZSH_THEME_SVN_PROMPT_PREFIX \
+	\
+	$ZSH_PROMPT_BASE_COLOR \
+	"$(svn_status_info $info)" \
+	$ZSH_THEME_BRANCH_NAME_COLOR \
+	$(svn_current_branch_name $info) \
+	$(svn_current_revision $info) \
+	$ZSH_THEME_SVN_PROMPT_SUFFIX \
+	$ZSH_PROMPT_BASE_COLOR \
+	"]"
+  fi
+}
+
+function svn_repo_need_upgrade() {
+  grep -q "E155036" <<< ${1:-$(svn info 2> /dev/null)} && \
+    echo "E155036: upgrade repo with svn upgrade"
+}
+
+function svn_current_branch_name() {
+  grep '^URL:' <<< "${1:-$(svn info 2> /dev/null)}" | egrep -o '(tags|branches)/[^/]+|trunk'
+}
+
+function svn_repo_root_name() {
+  grep '^Repository\ Root:' <<< "${1:-$(svn info 2> /dev/null)}" | sed 's#.*/##'
+}
+
+function svn_current_revision() {
+  echo "${1:-$(svn info 2> /dev/null)}" | sed -n 's/Revision: //p'
+}
+
+function svn_status_info() {
+  local svn_status_string="$ZSH_THEME_SVN_PROMPT_CLEAN"
+  local svn_status="$(svn status 2> /dev/null)";
+
+  # Additions
+  if command grep -E '^\s*A' &> /dev/null <<< $svn_status;  then svn_status_string="$svn_status_string${fg_bold[red]}✚$ZSH_THEME_BRANCH_NAME_COLOR"; else svn_status_string="$svn_status_string${fg_bold[green]}✚$ZSH_THEME_BRANCH_NAME_COLOR"; fi
+
+  # Deletions
+  if command grep -E '^\s*D' &> /dev/null <<< $svn_status; then svn_status_string="$svn_status_string${fg_bold[red]}✖$ZSH_THEME_BRANCH_NAME_COLOR"; else  svn_status_string="$svn_status_string${fg_bold[green]}✖$ZSH_THEME_BRANCH_NAME_COLOR"; fi
+
+  # Modifications
+  if command grep -E '^\s*M' &> /dev/null <<< $svn_status; then svn_status_string="$svn_status_string${fg_bold[red]}~$ZSH_THEME_BRANCH_NAME_COLOR"; else svn_status_string="$svn_status_string${fg_bold[green]}-$ZSH_THEME_BRANCH_NAME_COLOR" ;fi
+
+  # Replacements
+  if command grep -E '^\s*[R~]' &> /dev/null <<< $svn_status; then svn_status_string="$svn_status_string${fg_bold[red]}⟳$ZSH_THEME_BRANCH_NAME_COLOR"; else svn_status_string="$svn_status_string${fg_bold[green]}⟳$ZSH_THEME_BRANCH_NAME_COLOR" ; fi
+
+  # Untracked
+  if command grep -E '^\s*\?' &> /dev/null <<< $svn_status; then svn_status_string="$svn_status_string${fg_bold[red]}?$ZSH_THEME_BRANCH_NAME_COLOR"; else svn_status_string="$svn_status_string${fg_bold[green]}?$ZSH_THEME_BRANCH_NAME_COLOR" ; fi
+
+  # Dirty
+  if command grep -E '^\s*[CI!L]' &> /dev/null <<< $svn_status; then svn_status_string="$svn_status_string${fg_bold[red]}!"; else svn_status_string="$svn_status_string${fg_bold[green]}!" ; fi
+  echo $svn_status_string
+}
+
+############################################################
+#                        FUNCTIONS                         #
+############################################################
+
+function e
+{
+    emacs $1 &
+}
+
+
+function se
+{
+    sudo ${EDITOR} $1 &
+}
+
+function ownit
+{
+    sudo chown -R $USER:$USER $1 && sudo chmod -R 755 $1
+}
+
+function dtn
+{
+    dmesg | tail -n $1
+}
+
+function srch
+{
+    grep -Ri "$@" . 2> /dev/null
+}
+
+
+############################################################
+#                         PROMPT                           #
+############################################################
+function hg_prompt_info {
+    hg prompt --angle-brackets "\
+<hg:%{$fg[magenta]%}<branch>%{$reset_color%}><:%{$fg[magenta]%}<bookmark>%{$reset_color%}>\
+</%{$fg[yellow]%}<tags|%{$reset_color%}, %{$fg[yellow]%}>%{$reset_color%}>\
+%{$fg[red]%}<status|modified|unknown><update>%{$reset_color%}<
+patches: <patches|join( → )|pre_applied(%{$fg[yellow]%})|post_applied(%{$reset_color%})|pre_unapplied(%{$fg_bold[black]%})|post_unapplied(%{$reset_color%})>>" 2>/dev/null
+}
+
+function precmd {
+	 local TERMWIDTH
+    	 (( TERMWIDTH = ${COLUMNS} - 1 ))
+	 #Truncate the path if it's too long.
+	 PR_FILLBAR=""
+    	 PR_PWDLEN=""
+    	 local promptsize=${#${(%):---(%n@%m:%D{%H:%M:%S})---()--}}
+    	 local pwdsize=${#${(%):-%~}}
+	 SVNPROMPT=$(svn_prompt_info)
+	 local rev=$(svn_current_revision)
+	 local svnsize=0
+	 if [[ $rev != "" ]]; then
+	     (( svnsize = ${#rev} + 15 ))
+	 fi
+    	 if [[ "$promptsize + $pwdsize + $svnsize" -gt $TERMWIDTH ]]; then
+    	       ((PR_PWDLEN=$TERMWIDTH - $promptsize))
+    	 else
+		PR_FILLBAR="\${(l.(($TERMWIDTH - ($promptsize + $pwdsize + $svnsize)))..${PR_HBAR}.)}"
+    	 fi
+}
+
+setprompt () {
+	  setopt prompt_subst
+	  typeset -A altchar
+    	  set -A altchar ${(s..)terminfo[acsc]}
+    	  PR_SET_CHARSET="%{$terminfo[enacs]%}"
+    	  PR_SHIFT_IN="%{$terminfo[smacs]%}"
+    	  PR_SHIFT_OUT="%{$terminfo[rmacs]%}"
+    	  PR_HBAR=${altchar[q]:--}
+    	  PR_ULCORNER=${altchar[l]:--}
+    	  PR_LLCORNER=${altchar[m]:--}
+    	  PR_LRCORNER=${altchar[j]:--}
+    	  PR_URCORNER=${altchar[k]:--}
+	  smiley="%(?,%{${GREEN}%}=%)%{${NORM}%},%{${RED}%}=(%{${NORM}%})"
+#${PURPLE}%$PR_PWDLEN<...<%.%<<\
+	  PROMPT='$PR_SET_CHARSET$PR_STITLE${(e)PR_TITLEBAR}\
+${BOLD}${BAR_C}$PR_SHIFT_IN$PR_ULCORNER${BAR_C}$PR_HBAR$PR_SHIFT_OUT\
+${BOLD}${BAR_C}%(!.[\
+${ROOT_C}.${USER_C})% %n${NORM}${WHITE}@${BOLD}${MACHINE_C}%m${NORM}:${DATE_C}%D{%H:%M:%S}\
+${BOLD}${CYAN}]$SVNPROMPT$PR_SHIFT_IN$PR_HBAR${CYAN}$PR_HBAR${(e)PR_FILLBAR}${CYAN}$PR_HBAR$PR_SHIFT_OUT(\
+${PURPLE}%$PR_PWDLEN<...<%~%<<\
+${CYAN})$PR_SHIFT_IN$PR_HBAR${CYAN}$PR_URCORNER$PR_SHIFT_OUT${RED}\
+
+${CYAN}$PR_SHIFT_IN$PR_LLCORNER${CYAN}$PR_HBAR$PR_SHIFT_OUT(\
+${smiley}${CYAN})$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
+${CYAN}$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT${RED}>>\
+${NORM} '
+
+	PS2='${CYAN}$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
+${CYAN}$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT(\
+${GREEN}%_${CYAN})'
+}

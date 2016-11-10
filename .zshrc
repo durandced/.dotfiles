@@ -43,6 +43,7 @@ zstyle ':completion:*' glob 1
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*' insert-unambiguous false
 zstyle ':completion:*:options' list-colors '=^(-- *)=34'
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 zstyle ':completion:*:approximate:*' max-errors 2
 zstyle ':completion:*' menu select=0
 zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
@@ -91,9 +92,18 @@ alias spectrum_ls='x=`tput op` y=`printf %$((${COLUMNS}-6))s`;for i in {0..256};
 # 256 NEW COLORS
 CYAN="%{$FG[039]%}"
 CYAN_GREEN="%{$FG[036]%}"
-
+VIOLET="%{$FG[105]%}"
+WHITE="%{$FG[255]%}"
 # LS_COLORS
 # eval $( dircolors -b $HOME/.ls_colors )
+BAR_C=${CYAN}
+ROOT_C=${RED}
+USER_C=${CYAN_GREEN}
+MACHINE_C=${CYAN_GREEN}
+DATE_C=${VIOLET}
+
+source ~/.zsh_functions
+
 ############################################################
 #                      ZSH OPTIONS                         #
 ############################################################
@@ -214,87 +224,6 @@ elif [[ "$unamestr" == *'Archlinux'* ]]; then
     alias iu='sudo pacman -U'
     alias iui='sudo pacman -Syu'
 fi
-
-
-############################################################
-#                        FUNCTIONS                         #
-############################################################
-
-function e
-{
-    emacs $1 &
-}
-
-
-function se
-{
-    sudo ${EDITOR} $1 &
-}
-
-function ownit
-{
-    sudo chown -R $USER:$USER $1 && sudo chmod -R 755 $1
-}
-
-function dtn
-{
-    dmesg | tail -n $1
-}
-
-function srch
-{
-    grep -Ri "$@" . 2> /dev/null
-}
-
-
-############################################################
-#                         PROMPT                           #
-############################################################
-function precmd {
-	 local TERMWIDTH
-    	 (( TERMWIDTH = ${COLUMNS} - 1 ))
-	 #Truncate the path if it's too long.
-	 PR_FILLBAR=""
-    	 PR_PWDLEN=""
-    	 local promptsize=${#${(%):---(%n@%m:%D{%H:%M:%S})---()--}}
-    	 local pwdsize=${#${(%):-%~}}
-    	 if [[ "$promptsize + $pwdsize" -gt $TERMWIDTH ]]; then
-    	       ((PR_PWDLEN=$TERMWIDTH - $promptsize))
-    	 else
-		PR_FILLBAR="\${(l.(($TERMWIDTH - ($promptsize + $pwdsize)))..${PR_HBAR}.)}"
-    	 fi
-}
-
-setprompt () {
-	  setopt prompt_subst
-	  typeset -A altchar
-    	  set -A altchar ${(s..)terminfo[acsc]}
-    	  PR_SET_CHARSET="%{$terminfo[enacs]%}"
-    	  PR_SHIFT_IN="%{$terminfo[smacs]%}"
-    	  PR_SHIFT_OUT="%{$terminfo[rmacs]%}"
-    	  PR_HBAR=${altchar[q]:--}
-    	  PR_ULCORNER=${altchar[l]:--}
-    	  PR_LLCORNER=${altchar[m]:--}
-    	  PR_LRCORNER=${altchar[j]:--}
-    	  PR_URCORNER=${altchar[k]:--}
-	  smiley="%(?,%{${GREEN}%}=%)%{${NORM}%},%{${RED}%}=(%{${NORM}%})"
-#${PURPLE}%$PR_PWDLEN<...<%.%<<\
-	  PROMPT='$PR_SET_CHARSET$PR_STITLE${(e)PR_TITLEBAR}\
-${CYAN}$PR_SHIFT_IN$PR_ULCORNER${CYAN_GREEN}$PR_HBAR$PR_SHIFT_OUT${CYAN}%(!.[\
-${RED}.${GREEN})% %n${NORM}@${GREEN}%m${NORM}:${GREEN}%D{%H:%M:%S}${NORM}\
-${CYAN}]$PR_SHIFT_IN$PR_HBAR${CYAN}$PR_HBAR${(e)PR_FILLBAR}${CYAN}$PR_HBAR$PR_SHIFT_OUT(\
-${PURPLE}%$PR_PWDLEN<...<%~%<<\
-${CYAN})$PR_SHIFT_IN$PR_HBAR${CYAN}$PR_URCORNER$PR_SHIFT_OUT${RED}\
-
-${CYAN}$PR_SHIFT_IN$PR_LLCORNER${CYAN}$PR_HBAR$PR_SHIFT_OUT(\
-${smiley}${CYAN})$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
-${CYAN}$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT${RED}>>\
-${NORM} '
-
-	PS2='${CYAN}$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
-${CYAN}$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT(\
-${GREEN}%_${CYAN})'
-}
 
 setprompt
 
