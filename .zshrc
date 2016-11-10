@@ -94,6 +94,7 @@ CYAN="%{$FG[039]%}"
 CYAN_GREEN="%{$FG[036]%}"
 VIOLET="%{$FG[105]%}"
 WHITE="%{$FG[255]%}"
+ORANGE="%{$FG[202]%}"
 # LS_COLORS
 # eval $( dircolors -b $HOME/.ls_colors )
 BAR_C=${CYAN}
