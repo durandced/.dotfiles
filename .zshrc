@@ -95,13 +95,17 @@ CYAN_GREEN="%{$FG[036]%}"
 VIOLET="%{$FG[105]%}"
 WHITE="%{$FG[255]%}"
 ORANGE="%{$FG[202]%}"
+DARK_BLUE="%{$FG[027]%}"
+ROYAL_BLUE="%{$FG[033]%}"
 # LS_COLORS
-# eval $( dircolors -b $HOME/.ls_colors )
+
+eval $( dircolors -b $HOME/.dir_colors )
 BAR_C=${CYAN}
 ROOT_C=${RED}
 USER_C=${CYAN_GREEN}
 MACHINE_C=${CYAN_GREEN}
 DATE_C=${VIOLET}
+
 
 source ~/.zsh_functions
 
