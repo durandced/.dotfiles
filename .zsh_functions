@@ -173,10 +173,9 @@ function svn_prompt_info() {
 		$ZSH_PROMPT_BASE_COLOR \
 		"]"
 }
-
 function svn_repo_need_upgrade() {
-    lr=`svn info --show-item revision 2> /dev/null`
-    gr=`svn info --show-item revision \`svn info --show-item url 2> /dev/null\` 2> /dev/null`
+    lr=`svn info --show-item revision 2> /dev/null | sed 's/[^0-9]*//g'`
+    gr=`svn info --show-item revision \`svn info --show-item url 2> /dev/null\` 2> /dev/null | sed 's/[^0-9]*//g'`
      if [[ "$lr"  != "$gr" ]]  ; then \
 	 echo "-$gr"
      fi
