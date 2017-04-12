@@ -223,9 +223,9 @@ elif [[ "$unamestr" == *'Fedora'* ]]; then
     alias is='sudo yum search'
     alias iu='sudo yum update'
     alias iui='sudo yum upgrade'
-elif [[ "$unamestr" == *'Archlinux'* ]]; then
+elif [[ "$unamestr" == *'Archlinux'* || "$unamestr" == *'MANJARO'* ]]; then
     alias i='sudo pacman -S'
-    alias is='sudo pacman-Ss'
+    alias is='sudo pacman -Ss'
     alias iu='sudo pacman -U'
     alias iui='sudo pacman -Syu'
 fi
