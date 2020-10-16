@@ -21,14 +21,13 @@ ZSH_THEME_GIT_PROMPT_CONFLICTS="%{$fg[red]%}%{✖%G%}"
 ZSH_THEME_GIT_PROMPT_CHANGED="%{$fg[blue]%}%{✚%G%}"
 ZSH_THEME_GIT_PROMPT_BEHIND="%{↓%G%}"
 ZSH_THEME_GIT_PROMPT_AHEAD="%{↑%G%}"
-ZSH_THEME_GIT_PROMPT_UNTRACKED="%{…%G%}"
+ZSH_THEME_GIT_PROMPT_UNTRACKED="%{?%G%}"
 ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg_bold[green]%}%{✔%G%}"
 
 # svn-fast-info
 ZSH_PROMPT_BASE_COLOR=$CYAN
 ZSH_THEME_BRANCH_NAME_COLOR=$ORANGE
 ZSH_THEME_SVN_COLOR=$YELLOW
-ZSH_THEME_ALERT_COLOR=$RED
 ZSH_THEME_SVN_PROMPT_PREFIX="svn:("
 ZSH_THEME_SVN_PROMPT_SUFFIX=")"
 ZSH_THEME_SVN_PROMPT_CLEAN=""
@@ -38,6 +37,11 @@ STATUS=""
 
 __GIT_PROMPT_DIR="${0:A:h}"
 
+function virtualenv_info () {
+    [ $VIRTUAL_ENV ] && echo "($(basename $VIRTUAL_ENV))"
+}
+
+export VIRTUAL_ENV_DISABLE_PROMPT=0
 ## Hook function definitions
 function chpwd_update_git_vars() {
     update_current_git_vars
@@ -67,7 +71,7 @@ preexec_functions+=(preexec_update_git_vars)
 function update_current_git_vars() {
     unset __CURRENT_GIT_STATUS
 
-    local gitstatus="$__GIT_PROMPT_DIR/gitstatus.py"
+    local gitstatus="$__GIT_PROMPT_DIR/.gitstatus.py"
     _GIT_STATUS=$(python ${gitstatus} 2>/dev/null)
      __CURRENT_GIT_STATUS=("${(@s: :)_GIT_STATUS}")
     GIT_BRANCH=$__CURRENT_GIT_STATUS[1]
@@ -115,7 +119,7 @@ function git_super_status() {
       if [ "$GIT_UNTRACKED" -ne "0" ]; then
           STATUS="$STATUS$ZSH_THEME_GIT_PROMPT_UNTRACKED%{${reset_color}%}"
 	   # echo "git untracked"
-	  (( gitsize = $gitsize + 3 ))
+	  (( gitsize = $gitsize + 1 ))
       fi
       if [ "$GIT_CHANGED" -eq "0" ] && [ "$GIT_CONFLICTS" -eq "0" ] && [ "$GIT_STAGED" -eq "0" ] && [ "$GIT_UNTRACKED" -eq "0" ]; then
           STATUS="$STATUS$ZSH_THEME_GIT_PROMPT_CLEAN"
@@ -149,42 +153,42 @@ function svn_prompt_info() {
   info=$(svn info 2>&1) || return 1; # capture stdout and stderr
   local repo_need_upgrade=$(svn_repo_need_upgrade $info)
 
-  printf "%s%s%s%s%s%s%s-%s%s%s%s%s%s" \
-	 $ZSH_PROMPT_BASE_COLOR \
-	 "[" \
-	 $ZSH_THEME_SVN_COLOR \
-	 $ZSH_THEME_SVN_PROMPT_PREFIX \
-	 $ZSH_PROMPT_BASE_COLOR \
-	 "$(svn_status_info $info)" \
-	 $ZSH_THEME_SVN_COLOR \
-	 $ZSH_THEME_BRANCH_NAME_COLOR \
-	 $(svn_current_branch_name $info) \
-	 "/" \
-	 $ZSH_THEME_SVN_COLOR \
-	 $(svn_current_revision $info)
-	 if [[ -n $repo_need_upgrade ]]; then
-	     printf "%s%s" \
-		    $ZSH_THEME_ALERT_COLOR \
-		    $repo_need_upgrade
-	 fi
-	 printf "%s%s%s%s" \
-		$ZSH_THEME_SVN_COLOR \
-		$ZSH_THEME_SVN_PROMPT_SUFFIX \
-		$ZSH_PROMPT_BASE_COLOR \
-		"]"
+  if [[ -n $repo_need_upgrade ]]; then
+    printf '%s%s%s%s%s%s%s\n' \
+      $ZSH_PROMPT_BASE_COLOR \
+      $ZSH_THEME_SVN_PROMPT_PREFIX \
+      $ZSH_PROMPT_BASE_COLOR \
+      $repo_need_upgrade \
+      $ZSH_PROMPT_BASE_COLOR \
+      $ZSH_THEME_SVN_PROMPT_SUFFIX \
+      $ZSH_PROMPT_BASE_COLOR
+  else
+    printf '%s%s%s%s%s%s%s-%s%s%s%s%s%s%s%s' \
+	$ZSH_PROMPT_BASE_COLOR \
+	"[" \
+	$ZSH_THEME_SVN_COLOR \
+	$ZSH_THEME_SVN_PROMPT_PREFIX \
+	$ZSH_PROMPT_BASE_COLOR \
+	"$(svn_status_info $info)" \
+	$ZSH_THEME_SVN_COLOR \
+	$ZSH_THEME_BRANCH_NAME_COLOR \
+	$(svn_current_branch_name $info) \
+	"/" \
+	$ZSH_THEME_SVN_COLOR \
+	$(svn_current_revision $info) \
+	$ZSH_THEME_SVN_PROMPT_SUFFIX \
+	$ZSH_PROMPT_BASE_COLOR \
+	"]"
+  fi
 }
+
 function svn_repo_need_upgrade() {
-    lr=`svn info --show-item revision 2> /dev/null | sed 's/[^0-9]*//g'`
-    gr=`svn info --show-item revision \`svn info --show-item url 2> /dev/null\` 2> /dev/null | sed 's/[^0-9]*//g'`
-     if [[ "$lr"  != "$gr" ]]  ; then \
-	 echo "-$gr"
-     fi
-#  grep -q "E155036" <<< ${1:-$(svn info 2> /dev/null)} && \
-    #echo "upgrade repo with svn upgrade"
+  grep -q "E155036" <<< ${1:-$(svn info 2> /dev/null)} && \
+    echo "E155036: upgrade repo with svn upgrade"
 }
 
 function svn_current_branch_name() {
-  grep -E '^URL.?:' <<< "${1:-$(svn info 2> /dev/null)}" | egrep -o '(tags|branches)/[^/]+|trunk'
+  grep '^URL:' <<< "${1:-$(svn info 2> /dev/null)}" | egrep -o '(tags|branches)/[^/]+|trunk'
 }
 
 function svn_repo_root_name() {
@@ -192,15 +196,12 @@ function svn_repo_root_name() {
 }
 
 function svn_current_revision() {
-  svn info --show-item revision 2> /dev/null
-  #echo "$(svn info 2> /dev/null)" | awk -F " " '/R(..|.)v/ {print $NF}' | head -n 1
-  #echo "${2:-$(svn info 2> /dev/null)}" | sed -n 's/R.v.*: //p' | tail -n 1
-  #echo "${1:-$(svn info 2> /dev/null)}" | sed -n 's/R.vision: //p'
+  echo "${1:-$(svn info 2> /dev/null)}" | sed -n 's/Revision: //p'
 }
 
 function svn_status_info() {
   local svn_status_string="$ZSH_THEME_SVN_PROMPT_CLEAN"
-  local svn_status="$(svn status 2> /dev/null)";
+  local svn_status="$(svn status --depth immediates 2> /dev/null)";
 
   # Additions
   if command grep -E '^\s*A' &> /dev/null <<< $svn_status;  then svn_status_string="$svn_status_string${fg_bold[red]}✚$ZSH_THEME_SVN_COLOR"; else svn_status_string="$svn_status_string${fg_bold[green]}✚$ZSH_THEME_SVN_COLOR"; fi
@@ -231,6 +232,15 @@ function e
     emacs $1 &
 }
 
+function m
+{
+    mount ${@:1} | column -t
+}
+
+function g
+{
+  grep --color=auto -RIni $1 . 2> /dev/null
+}
 
 function se
 {
@@ -252,6 +262,55 @@ function srch
     grep -Ri "$@" . 2> /dev/null
 }
 
+############################################################
+#                     EMBEDDED DEV                         #
+############################################################
+#Device Tree Print Help
+function dtph
+{
+    # Todo Argument check
+
+    grep "compatible" $1 | sort -u | sed -e "s/^\s*\(.*\)/\\1/" |
+	while read NEXT ; do
+	    echo $NEXT ;
+	    echo $NEXT | sed -e 's/[^"]*["]\([^"]*\)["][^"]*/\1\n/g' | while read NEXT1 ; do
+		if [ "$NEXT1" != "syscon" ] ; then
+		    if [ -n "$NEXT1" ] ; then
+			grep -Rl "$NEXT1" Documentation/* ;
+			grep -Rl "$NEXT1" drivers/* ;
+		    fi ;
+		fi ;
+	    done | sort -u ;
+	    echo "" ;
+	done
+}
+
+function sopcparse
+{
+    # Todo Argument check
+
+    cat $1 | sed -E -e "/<parameter name=\".+_PinMuxing\">/,/<\/parameter>/P" -e "D" | \
+    sed -E -e "/parameter/P" -e "/value/P" -e "D" | \
+    sed -n -E -e "/^.*<parameter.*>.*$/h" \
+    -e "s/^.*<\/parameter>.*$//;T noprint;g;s/^.*<parameter name=\"(.+)_PinMuxing\">.*$/\1/;T noprint;P;: noprint;" \
+    -e "s/^.*<value>Unused<\/value>.*$//;T nodel;h;: nodel"
+}
+
+function a10sopcheaders
+{
+    # Todo Argument check
+
+    mkdir -p qsys_headers
+    sopc-create-header-files $1 --output-dir qsys_headers
+}
+
+function s10sopcheaders
+{
+    # Todo Argument check
+
+    mkdir -p qsys_headers
+    sopc-create-header-files $1 --output-dir qsys_headers --separate-masters
+}
 
 ############################################################
 #                         PROMPT                           #
@@ -266,7 +325,7 @@ patches: <patches|join( → )|pre_applied(%{$fg[yellow]%})|post_applied(%{$reset
 
 function precmd {
 	 local TERMWIDTH
-    	 (( TERMWIDTH = ${COLUMNS} - 1 ))
+    	 (( TERMWIDTH = ${COLUMNS} + 1 ))
 	 #Truncate the path if it's too long.
 	 PR_FILLBAR=""
     	 PR_PWDLEN=""
@@ -275,17 +334,19 @@ function precmd {
 	 SVNPROMPT=$(svn_prompt_info)
 	 local rev=$(svn_current_revision)
 	 local st=$(svn_current_branch_name)
-	 local su=$(svn_repo_need_upgrade)
 	 local svnsize=0
 	 GITPROMPT=$(git_super_status)
 	 gitsize=$?
+	 local venv=$(virtualenv_info)
+	 venvsize=$?
+	 VPROMPT=$venv
 	 if [[ $rev != "" ]]; then
-	     (( svnsize = ${#rev} + ${#st} + 15 + ${#su}))
+	     (( svnsize = ${#rev} + ${#st} + 15 ))
 	 fi
-    	 if [[ "$promptsize + $pwdsize + $svnsize + $gitsize" -gt $TERMWIDTH ]]; then
+    	 if [[ "$promptsize + $pwdsize + $svnsize + $venvsize + $gitsize" -gt $TERMWIDTH ]]; then
     	       ((PR_PWDLEN=$TERMWIDTH - $promptsize))
     	 else
-		PR_FILLBAR="\${(l.(($TERMWIDTH - ($promptsize + $pwdsize + $svnsize + $gitsize)))..${PR_HBAR}.)}"
+		PR_FILLBAR="\${(l.(($TERMWIDTH - ($promptsize + $pwdsize + $svnsize + ${#venv} + $gitsize)))..${PR_HBAR}.)}"
     	 fi
 }
 
@@ -307,16 +368,16 @@ setprompt () {
 ${BOLD}${BAR_C}$PR_SHIFT_IN$PR_ULCORNER${BAR_C}$PR_HBAR$PR_SHIFT_OUT\
 ${BOLD}${BAR_C}%(!.[\
 ${ROOT_C}.${USER_C})% %n${NORM}${WHITE}@${BOLD}${MACHINE_C}%m${NORM}:${DATE_C}%D{%H:%M:%S}\
-${BOLD}${CYAN}]$SVNPROMPT$GITPROMPT$PR_SHIFT_IN$PR_HBAR${CYAN}$PR_HBAR${(e)PR_FILLBAR}${CYAN}$PR_HBAR$PR_SHIFT_OUT(\
+${BOLD}${BAR_C}]$SVNPROMPT$GITPROMPT${VCOLOR}$VPROMPT${BAR_C}$PR_SHIFT_IN$PR_HBAR${BAR_C}$PR_HBAR${(e)PR_FILLBAR}${BAR_C}$PR_HBAR$PR_SHIFT_OUT(\
 ${PURPLE}%$PR_PWDLEN<...<%~%<<\
-${CYAN})$PR_SHIFT_IN$PR_HBAR${CYAN}$PR_URCORNER$PR_SHIFT_OUT${RED}\
+${BAR_C})$PR_SHIFT_IN$PR_HBAR${BAR_C}$PR_URCORNER$PR_SHIFT_OUT${RED}\
 
-${CYAN}$PR_SHIFT_IN$PR_LLCORNER${CYAN}$PR_HBAR$PR_SHIFT_OUT(\
-${smiley}${CYAN})$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
-${CYAN}$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT${RED}>>\
+${BAR_C}$PR_SHIFT_IN$PR_LLCORNER${BAR_C}$PR_HBAR$PR_SHIFT_OUT(\
+${smiley}${BAR_C})$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
+${BAR_C}$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT${RED}>>\
 ${NORM} '
 
-	PS2='${CYAN}$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
-${CYAN}$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT(\
-${GREEN}%_${CYAN})'
+	PS2='${BAR_C}$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
+${BAR_C}$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT(\
+${GREEN}%_${BAR_C})'
 }
