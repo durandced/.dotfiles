@@ -1,10 +1,41 @@
-## Created by Cedric Durand
-## Login   <durand_c@epita.fr>
+# Path to your oh-my-zsh installation.
+export ZSH="/$HOME/.oh-my-zsh"
+ZSH_THEME="d34db33f"
+COMPLETION_WAITING_DOTS="true"
 
+# Uncomment the following line to use case-sensitive completion.
+# CASE_SENSITIVE="true"
+
+# Uncomment the following line to use hyphen-insensitive completion.
+# Case-sensitive completion must be off. _ and - will be interchangeable.
+# HYPHEN_INSENSITIVE="true"
+
+# Uncomment the following line to automatically update without prompting.
+# DISABLE_UPDATE_PROMPT="true"
+
+# Uncomment the following line to change how often to auto-update (in days).
+# export UPDATE_ZSH_DAYS=13
+
+# Uncomment the following line if pasting URLs and other text is messed up.
+# DISABLE_MAGIC_FUNCTIONS=true
+
+# Uncomment the following line to disable auto-setting terminal title.
+# DISABLE_AUTO_TITLE="true"
+
+# Uncomment the following line to enable command auto-correction.
+# ENABLE_CORRECTION="true"
+
+# Would you like to use another custom folder than $ZSH/custom?
+# ZSH_CUSTOM=/path/to/new-custom-folder
+plugins=(git git-prompt docker python virtualenv)
+
+source $ZSH/oh-my-zsh.sh
+
+# User configuration
 export OLDPATH=$PATH
-export DEFPATH=~/bin:/sbin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/home/cdurand/.fzf/bin:/snap/bin/
-#export PATH=~/bin:/sbin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
+export PATH=~/bin:/sbin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:$HOME.fzf/bin:/snap/bin/
 export WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
+
 ############################################################
 #                        HISTORY                           #
 ############################################################
@@ -29,62 +60,7 @@ export BAT_PAGER="less -RF"
 xset b off &> /dev/null
 xset r rate 300 100 &> /dev/null
 umask 022
-
-############################################################
-#                        COULEURS                          #
-############################################################
-BLACK="%{"$'\033[01;30m'"%}"
-GREEN="%{"$'\033[01;32m'"%}"
-RED="%{"$'\033[01;31m'"%}"
-YELLOW="%{"$'\033[01;33m'"%}"
-BLUE="%{"$'\033[01;34m'"%}"
-PURPLE="%{"$'\033[01;35m'"%}"
-BROWN="%{"$'\033[00;33m'"%}"
-CYAN="%{"$'\033[00;36m'"%}"
-BOLD="%{"$'\033[01;39m'"%}"
-NORM="%{"$'\033[00m'"%}"
-
-### Spectrum ###
-typeset -AHg FX FG BG
-
-FX=(
-    reset     "%{[00m%}"
-    bold      "%{[01m%}" no-bold      "%{[22m%}"
-    italic    "%{[03m%}" no-italic    "%{[23m%}"
-    underline "%{[04m%}" no-underline "%{[24m%}"
-    blink     "%{[05m%}" no-blink     "%{[25m%}"
-    reverse   "%{[07m%}" no-reverse   "%{[27m%}"
-)
-
-for color in {000..255}; do
-    FG[$color]="[38;5;${color}m"
-    BG[$color]="[48;5;${color}m"
-done
-
-# Run this command to view all available colors.
-alias spectrum_ls='x=`tput op` y=`printf %$((${COLUMNS}-6))s`;for i in {0..256};do o=00$i;echo -e ${o:${#o}-3:3} `tput setaf $i;tput setab $i`${y// /=}$x;done;'
-
-# 256 NEW COLORS
-CYAN="%{$FG[039]%}"
-CYAN_GREEN="%{$FG[036]%}"
-VIOLET="%{$FG[105]%}"
-WHITE="%{$FG[255]%}"
-ORANGE="%{$FG[202]%}"
-DARK_BLUE="%{$FG[027]%}"
-ROYAL_BLUE="%{$FG[033]%}"
-LIGHT_GREY="%{$FG[240]%}"
-# LS_COLORS
-
 eval $( dircolors -b $HOME/.dir_colors )
-BAR_C=${CYAN}
-ROOT_C=${RED}
-VCOLOR=${LIGHT_GREY}
-USER_C=${CYAN_GREEN}
-MACHINE_C=${CYAN_GREEN}
-DATE_C=${VIOLET}
-
-
-source ~/.zsh_functions
 
 ############################################################
 #                      ZSH OPTIONS                         #
@@ -178,6 +154,43 @@ autoload -U compinit
 compinit -u -i
 
 ############################################################
+#                        FUNCTIONS                         #
+############################################################
+
+function e
+{
+    emacs $1 &
+}
+
+function m
+{
+    mount ${@:1} | column -t
+}
+
+function g
+{
+  grep --color=auto -RIni "$@" . 2> /dev/null
+}
+
+function se
+{
+    sudo ${EDITOR} $1 &
+}
+
+function ownit
+{
+    sudo chown -R $USER:$USER $1 && sudo chmod -R 755 $1
+}
+
+function dtn
+{
+    dmesg | tail -n $1
+}
+
+alias spectrum_ls='x=`tput op` y=`printf %$((${COLUMNS}-6))s`;for i in {0..256};do o=00$i;echo -e ${o:${#o}-3:3} `tput setaf $i;tput setab $i`${y// /=}$x;done;'
+
+
+############################################################
 #                         ALIASES                          #
 ############################################################
 alias c='clear'
@@ -209,7 +222,6 @@ alias th='thunderbird &'
 alias mkdir='mkdir -pv'
 alias path='echo -e ${PATH//:/\\n}'
 alias nowdate='date +"%d-%m-%Y - %T"'
-alias cat='bat'
 alias lg='lazygit'
 # Forcer ouverture par extension fichier
 alias -s pdf=xpdf
@@ -239,17 +251,4 @@ elif [[ "$unamestr" == *'Archlinux'* ]]; then
     alias iui='sudo pacman -Syu'
 fi
 
-setprompt
-
-############################################################
-#                     LAUNCHING ZSH                        #
-############################################################
-#clear
-
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-PATH="/home/cdurand/perl5/bin${PATH:+:${PATH}}"; export PATH;
-PERL5LIB="/home/cdurand/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
-PERL_LOCAL_LIB_ROOT="/home/cdurand/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
-PERL_MB_OPT="--install_base \"/home/cdurand/perl5\""; export PERL_MB_OPT;
-PERL_MM_OPT="INSTALL_BASE=/home/cdurand/perl5"; export PERL_MM_OPT;
