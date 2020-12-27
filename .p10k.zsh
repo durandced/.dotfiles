@@ -37,6 +37,7 @@
     vcs                     # git status
     # =========================[ Line #2 ]=========================
     newline                 # \n
+    status                  # exit code of the last command
     prompt_char             # prompt symbol
   )
 
@@ -46,18 +47,15 @@
   # last prompt line gets hidden if it would overlap with left prompt.
   typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
     # =========================[ Line #1 ]=========================
-    status                  # exit code of the last command
-    command_execution_time  # duration of the last command
+    # command_execution_time  # duration of the last command
     background_jobs         # presence of background jobs
     direnv                  # direnv status (https://direnv.net/)
     asdf                    # asdf version manager (https://github.com/asdf-vm/asdf)
-    virtualenv              # python virtual environment (https://docs.python.org/3/library/venv.html)
-    anaconda                # conda environment (https://conda.io/)
-    pyenv                   # python environment (https://github.com/pyenv/pyenv)
-    goenv                   # go environment (https://github.com/syndbg/goenv)
-    nodenv                  # node.js version from nodenv (https://github.com/nodenv/nodenv)
-    nvm                     # node.js version from nvm (https://github.com/nvm-sh/nvm)
-    nodeenv                 # node.js environment (https://github.com/ekalinin/nodeenv)
+    #anaconda                # conda environment (https://conda.io/)
+    #goenv                   # go environment (https://github.com/syndbg/goenv)
+    #nodenv                  # node.js version from nodenv (https://github.com/nodenv/nodenv)
+    #nvm                     # node.js version from nvm (https://github.com/nvm-sh/nvm)
+    #nodeenv                 # node.js environment (https://github.com/ekalinin/nodeenv)
     # node_version          # node.js version
     # go_version            # go version (https://golang.org)
     # rust_version          # rustc version (https://www.rust-lang.org)
@@ -66,41 +64,43 @@
     # laravel_version       # laravel php framework version (https://laravel.com/)
     # java_version          # java version (https://www.java.com/)
     # package               # name@version from package.json (https://docs.npmjs.com/files/package.json)
-    rbenv                   # ruby version from rbenv (https://github.com/rbenv/rbenv)
-    rvm                     # ruby version from rvm (https://rvm.io)
-    fvm                     # flutter version management (https://github.com/leoafarias/fvm)
-    luaenv                  # lua version from luaenv (https://github.com/cehoffman/luaenv)
-    jenv                    # java version from jenv (https://github.com/jenv/jenv)
-    plenv                   # perl version from plenv (https://github.com/tokuhirom/plenv)
-    phpenv                  # php version from phpenv (https://github.com/phpenv/phpenv)
-    scalaenv                # scala version from scalaenv (https://github.com/scalaenv/scalaenv)
-    haskell_stack           # haskell version from stack (https://haskellstack.org/)
-    kubecontext             # current kubernetes context (https://kubernetes.io/)
-    terraform               # terraform workspace (https://www.terraform.io)
-    aws                     # aws profile (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html)
-    aws_eb_env              # aws elastic beanstalk environment (https://aws.amazon.com/elasticbeanstalk/)
-    azure                   # azure account name (https://docs.microsoft.com/en-us/cli/azure)
-    gcloud                  # google cloud cli account and project (https://cloud.google.com/)
-    google_app_cred         # google application credentials (https://cloud.google.com/docs/authentication/production)
+    #rbenv                   # ruby version from rbenv (https://github.com/rbenv/rbenv)
+    #rvm                     # ruby version from rvm (https://rvm.io)
+    #fvm                     # flutter version management (https://github.com/leoafarias/fvm)
+    #luaenv                  # lua version from luaenv (https://github.com/cehoffman/luaenv)
+    #jenv                    # java version from jenv (https://github.com/jenv/jenv)
+    #plenv                   # perl version from plenv (https://github.com/tokuhirom/plenv)
+    #phpenv                  # php version from phpenv (https://github.com/phpenv/phpenv)
+    #scalaenv                # scala version from scalaenv (https://github.com/scalaenv/scalaenv)
+    #haskell_stack           # haskell version from stack (https://haskellstack.org/)
+    #kubecontext             # current kubernetes context (https://kubernetes.io/)
+    #terraform               # terraform workspace (https://www.terraform.io)
+    #aws                     # aws profile (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html)
+    #aws_eb_env              # aws elastic beanstalk environment (https://aws.amazon.com/elasticbeanstalk/)
+    #azure                   # azure account name (https://docs.microsoft.com/en-us/cli/azure)
+    #gcloud                  # google cloud cli account and project (https://cloud.google.com/)
+    #google_app_cred         # google application credentials (https://cloud.google.com/docs/authentication/production)
     context                 # user@hostname
-    nordvpn                 # nordvpn connection status, linux only (https://nordvpn.com/)
-    ranger                  # ranger shell (https://github.com/ranger/ranger)
-    nnn                     # nnn shell (https://github.com/jarun/nnn)
-    vim_shell               # vim shell indicator (:sh)
-    midnight_commander      # midnight commander shell (https://midnight-commander.org/)
-    nix_shell               # nix shell (https://nixos.org/nixos/nix-pills/developing-with-nix-shell.html)
+    #nordvpn                 # nordvpn connection status, linux only (https://nordvpn.com/)
+    #ranger                  # ranger shell (https://github.com/ranger/ranger)
+    #nnn                     # nnn shell (https://github.com/jarun/nnn)
+    #vim_shell               # vim shell indicator (:sh)
+    #midnight_commander      # midnight commander shell (https://midnight-commander.org/)
+    # nix_shell               # nix shell (https://nixos.org/nixos/nix-pills/developing-with-nix-shell.html)
     # vi_mode               # vi mode (you don't need this if you've enabled prompt_char)
-    # vpn_ip                # virtual private network indicator
+    vpn_ip                # virtual private network indicator
     # load                  # CPU load
     # disk_usage            # disk usage
     # ram                   # free RAM
     # swap                  # used swap
-    todo                    # todo items (https://github.com/todotxt/todo.txt-cli)
-    timewarrior             # timewarrior tracking status (https://timewarrior.net/)
-    taskwarrior             # taskwarrior task count (https://taskwarrior.org/)
+    #todo                    # todo items (https://github.com/todotxt/todo.txt-cli)
+    #timewarrior             # timewarrior tracking status (https://timewarrior.net/)
+    #taskwarrior             # taskwarrior task count (https://taskwarrior.org/)
     time                    # current time
     # =========================[ Line #2 ]=========================
     newline                 # \n
+    virtualenv              # python virtual environment (https://docs.python.org/3/library/venv.html)
+    pyenv                   # python environment (https://github.com/pyenv/pyenv)
     # ip                    # ip address and bandwidth usage for a specified network interface
     # public_ip             # public IP address
     # proxy                 # system-wide http/https/ftp proxy
@@ -137,9 +137,9 @@
   typeset -g POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_PREFIX=
   typeset -g POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX=
   # Connect right prompt lines with these symbols.
-  typeset -g POWERLEVEL9K_MULTILINE_FIRST_PROMPT_SUFFIX='%240F─╮'
-  typeset -g POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_SUFFIX='%240F─┤'
-  typeset -g POWERLEVEL9K_MULTILINE_LAST_PROMPT_SUFFIX='%240F─╯'
+  typeset -g POWERLEVEL9K_MULTILINE_FIRST_PROMPT_SUFFIX="%${BAR_COLOR}F─╮"
+  typeset -g POWERLEVEL9K_MULTILINE_NEWLINE_PROMPT_SUFFIX="%${BAR_COLOR}F─┤"
+  typeset -g POWERLEVEL9K_MULTILINE_LAST_PROMPT_SUFFIX="%${BAR_COLOR}F─╯"
 
   # Filler between left and right prompt on the first prompt line. You can set it to ' ', '·' or
   # '─'. The last two make it easier to see the alignment between left and right prompt and to
@@ -151,7 +151,7 @@
   if [[ $POWERLEVEL9K_MULTILINE_FIRST_PROMPT_GAP_CHAR != ' ' ]]; then
     # The color of the filler. You'll probably want to match the color of POWERLEVEL9K_MULTILINE
     # ornaments defined above.
-    typeset -g POWERLEVEL9K_MULTILINE_FIRST_PROMPT_GAP_FOREGROUND=240
+    typeset -g POWERLEVEL9K_MULTILINE_FIRST_PROMPT_GAP_FOREGROUND=${BAR_COLOR}
     # Start filler from the edge of the screen if there are no left segments on the first line.
     typeset -g POWERLEVEL9K_EMPTY_LINE_LEFT_PROMPT_FIRST_SEGMENT_END_SYMBOL='%{%}'
     # End filler on the edge of the screen if there are no right segments on the first line.
@@ -221,35 +221,36 @@
   typeset -g POWERLEVEL9K_DIR_SHORTENED_FOREGROUND=103
   # Color of the anchor directory segments. Anchor segments are never shortened. The first
   # segment is always an anchor.
-  typeset -g POWERLEVEL9K_DIR_ANCHOR_FOREGROUND=39
+  typeset -g POWERLEVEL9K_DIR_ANCHOR_FOREGROUND=${BAR_COLOR}
   # Display anchor directory segments in bold.
-  typeset -g POWERLEVEL9K_DIR_ANCHOR_BOLD=true
+  typeset -g POWERLEVEL9K_DIR_ANCHOR_BOLD=false
   # Don't shorten directories that contain any of these files. They are anchors.
   local anchor_files=(
-    .bzr
-    .citc
-    .git
-    .hg
-    .node-version
-    .python-version
-    .go-version
-    .ruby-version
-    .lua-version
-    .java-version
-    .perl-version
-    .php-version
-    .tool-version
-    .shorten_folder_marker
-    .svn
-    .terraform
-    CVS
-    Cargo.toml
-    composer.json
-    go.mod
-    package.json
-    stack.yaml
+  #   .bzr
+  #   .citc
+     .git
+  #   .hg
+  #   .node-version
+  #   .python-version
+  #   .go-version
+  #   .ruby-version
+  #   .lua-version
+  #   .java-version
+  #   .perl-version
+  #   .php-version
+  #   .tool-version
+  #   .shorten_folder_marker
+  #   .svn
+  #   .terraform
+  #   CVS
+  #   Cargo.toml
+  #   composer.json
+  #   go.mod
+  #   package.json
+  #   stack.yaml
+  #   README.md
   )
-  typeset -g POWERLEVEL9K_SHORTEN_FOLDER_MARKER="(${(j:|:)anchor_files})"
+  typeset -g POWERLEVEL9K_SHORTEN_FOLDER_MARKER="(${(j:|:)})"
   # If set to "first" ("last"), remove everything before the first (last) subdirectory that contains
   # files matching $POWERLEVEL9K_SHORTEN_FOLDER_MARKER. For example, when the current directory is
   # /foo/bar/git_repo/nested_git_repo/baz, prompt will display git_repo/nested_git_repo/baz (first)
@@ -260,7 +261,7 @@
   # This moves the truncation point to the right (positive offset) or to the left (negative offset)
   # relative to the marker. Plain "first" and "last" are equivalent to "first:0" and "last:0"
   # respectively.
-  typeset -g POWERLEVEL9K_DIR_TRUNCATE_BEFORE_MARKER=false
+  typeset -g POWERLEVEL9K_DIR_TRUNCATE_BEFORE_MARKER=yes
   # Don't shorten this many last directory segments. They are anchors.
   typeset -g POWERLEVEL9K_SHORTEN_DIR_LENGTH=1
   # Shorten directory if it's longer than this even if there is space for it. The value can
@@ -268,13 +269,13 @@
   # directory will be shortened only when prompt doesn't fit or when other parameters demand it
   # (see POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS and POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT below).
   # If set to `0`, directory will always be shortened to its minimum length.
-  typeset -g POWERLEVEL9K_DIR_MAX_LENGTH=80
+  typeset -g POWERLEVEL9K_DIR_MAX_LENGTH=0
   # When `dir` segment is on the last prompt line, try to shorten it enough to leave at least this
   # many columns for typing commands.
-  typeset -g POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS=40
+  typeset -g POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS=10
   # When `dir` segment is on the last prompt line, try to shorten it enough to leave at least
   # COLUMNS * POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT * 0.01 columns for typing commands.
-  typeset -g POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT=50
+  typeset -g POWERLEVEL9K_DIR_MIN_COMMAND_COLUMNS_PCT=30
   # If set to true, embed a hyperlink into the directory. Useful for quickly
   # opening a directory in the file manager simply by clicking the link.
   # Can also be handy when the directory is shortened, as it allows you to see
@@ -374,7 +375,7 @@
       local       meta='%246F'  # grey foreground
       local      clean='%76F'   # green foreground
       local   modified='%178F'  # yellow foreground
-      local  untracked='%39F'   # blue foreground
+      local  untracked="%${BAR_COLOR}F"   # blue foreground
       local conflicted='%196F'  # red foreground
     else
       # Styling for incomplete and stale Git status.

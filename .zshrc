@@ -9,7 +9,7 @@ fi
 export ZSH="/$HOME/.oh-my-zsh"
 ZSH_THEME="powerlevel10k/powerlevel10k"
 COMPLETION_WAITING_DOTS="true"
-
+BAR_COLOR=039
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
 
@@ -31,17 +31,26 @@ COMPLETION_WAITING_DOTS="true"
 
 # Uncomment the following line to enable command auto-correction.
 # ENABLE_CORRECTION="true"
+# User configuration
+#export OLDPATH=$PATH
+#export PATH=~/bin:/sbin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:$HOME.fzf/bin:/snap/bin/
+export WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder
-plugins=(git git-prompt docker python virtualenv)
+plugins=(git command-not-found copybuffer copydir copyfile
+         git-prompt
+         docker docker-compose
+         python virtualenv pyenv pylint
+         asdf direnv
+         common-aliases ubuntu
+         cp fd
+         cargo # Rust
+#         emacs
+
+        )
 
 source $ZSH/oh-my-zsh.sh
-
-# User configuration
-export OLDPATH=$PATH
-export PATH=~/bin:/sbin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:$HOME.fzf/bin:/snap/bin/
-export WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 
 ############################################################
 #                        HISTORY                           #
@@ -174,7 +183,7 @@ function m
     mount ${@:1} | column -t
 }
 
-function g
+function s
 {
   grep --color=auto -RIni "$@" . 2> /dev/null
 }
@@ -200,44 +209,13 @@ alias spectrum_ls='x=`tput op` y=`printf %$((${COLUMNS}-6))s`;for i in {0..256};
 ############################################################
 #                         ALIASES                          #
 ############################################################
-alias c='clear'
-alias ls='ls -bh -CF --color=always'
-alias la='ls -lah'
-alias ll='ls -lh'
-alias grep='grep --color=auto'
-alias egrep='egrep --color=auto'
-alias mv='mv -i'
-alias mm='make -j8'
-alias mmm='mm debug'
-alias mc='make clean'
-alias mcc='make cleanall'
-alias x='$LTERM &'
-alias t='tar -xf'
-alias tv='tar -xvf'
-alias du='du -h'
+alias b='bat -p'
 alias df='df -h'
 alias dt='dmesg | tail -n 10'
-alias 007='kill -9 -1'
-alias ..='cd ../'
-alias ...='cd ../../'
-alias ....='cd ../../../'
-alias .....='cd ../../../../'
-alias ff='firefox &'
-alias gpp='g++42 -Wall -Wextra -Werror -pedantic -pedantic-errors -std=c++98'
-alias th='thunderbird &'
-
 alias mkdir='mkdir -pv'
 alias path='echo -e ${PATH//:/\\n}'
 alias nowdate='date +"%d-%m-%Y - %T"'
 alias lg='lazygit'
-# Forcer ouverture par extension fichier
-alias -s pdf=xpdf
-alias -s c=e
-alias -s h=e
-# Work in Goinfre
-#alias work='workdir=`mktemp -d /goinfre/durand_c-XXXXXX`; chmod 700 $workdir; cd $workdir; set_color -o red; echo "-Welcome to the Goinfre-"; set_color normal; pwd'
-#alias tigrou='workdir=`mktemp -d /goinfre/durand_c-XXXXXX`; chmod 700 $workdir; set_color -o red; echo "-Welcome to the Goinfre, Get ready to work that Fuckin Tiger Project-"; set_color normal; pwd ;  cd ~/ing1/tiger/tc1/campan_t ; svn up ; cp -r ../ $workdir ; cd $workdir/campan_t ; export CONFIG_SITE=~/config.site ; ./bootstrap && ./configure && gmake'
-#alias save='savedir=`basename $(pwd)`; mkdir ~/$savedir; cp -R * ~/$savedir/;set_color -o red; echo "-Folder saved-";set_color normal;'
 
 ### OS Specifics
 unamestr=`uname -a`
