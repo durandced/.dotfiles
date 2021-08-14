@@ -79,20 +79,141 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git command-not-found copybuffer copydir copyfile
-         git-prompt
-         docker docker-compose
-         python virtualenv pyenv pylint
-         asdf direnv
-         common-aliases ubuntu
-         cp fd
-         cargo
-         # Rust
-         # emacs
-        )
+plugins=(
+    alias-finder		# List and find aliases
+    cargo			    # Rust build tool
+    command-not-found	# List package to install to get this command
+    common-aliases		# Classic aliases
+    copybuffer			# Ctrl+o copies the current command line to the clipboard
+    copydir			    # typing copydir copies the current folder to the clipboard
+    copyfile			# copyfile <filename> copies the contents of the file to the clipboard
+    dircycle			# Ctrl + Shift + Left / Right cycles through popd/pushd 
+    docker			    # autocompletion for docker
+    docker-compose		# aliases for docker-compose
+    # emacs			    # aliases for emacsclient
+    extract			    # wrapper for all file extractions
+    fd				    # autocompletion for fd
+    fzf				    # fuzzy auto-completion
+    gh				    # autocompletion for github cli
+    git				    # git aliases and autocompletion
+    git-auto-fetch		# git-auto-fetch to disable/enable auto fetching in git folder
+    git-prompt			# displays git prompt in shell
+    jsontools			# json command line tools
+    mosh			    # autocompletion for mosh
+    nmap			    # aliases for classic nmap commands
+    pep8			    # autocompletion for pep8
+    # per-directory-history	# Ctrl+G to switch history. To check if compatible with fzf
+    pip				    # completion for pip + aliases
+    pipenv			    # completion and aliases for pipenv
+    # pyenv			    # loads pyenv if found
+    pylint			    # completion and aliases for pylinbt
+    python			    # aliases for python
+    # redis-cli		    # completion for redis
+    repo			    # completion and aliases for repo
+    ripgrep             # completion for rg
+    rsync               # aliases for rsync
+    rust                # completion for rustc compiler
+    rustup              # completion for rustup installer
+    screen              # sets title and hardstatus for screen
+    ssh-agent           # starts ssh-agent
+    systemadmin         # aliases and functions 
+    systemd             # aliases for systemd
+    taskwarrior         # completion for taskwarrior
+    thefuck             # Esc-Esc corrects previous command
+    tmux                # aliases for tmux
+    tmuxinator          # completion for tmuxinator
+    ubuntu			    # Might want to change that in some cases
+    ufw                 # completion for ufw
+    virtualenv          # displays virtualenv in prompt
+    vscode              # aliases for vscode
+    wd                  # warp directory
+    web-search          # search shit directly from command line
+    zsh-autosuggestions
+)
+
+############################################################
+#                 PLUGIN-BASED ALIASES                     #
+############################################################
+
+ZSH_ALIAS_FINDER_AUTOMATIC=true
+alias a='alias-finder -l'
+
+zstyle ':completion:*:*:docker:*' option-stacking yes
+zstyle ':completion:*:*:docker-*:*' option-stacking yes
+
+zstyle :omz:plugins:ssh-agent agent-forwarding on
+zstyle :omz:plugins:ssh-agent identities id_rsa id_ledger
+
+bindkey '^ ' autosuggest-accept
+
+############################################################
+#                         ALIASES                          #
+############################################################
+alias b='bat -p'
+alias df='df -h'
+alias dt='dmesg | tail -n 10'
+alias mkdir='mkdir -pv'
+alias path='echo -e ${PATH//:/\\n}'
+alias nowdate='date +"%d-%m-%Y - %T"'
+alias lg='lazygit'
+
+alias spectrum_ls='x=`tput op` y=`printf %$((${COLUMNS}-6))s`;for i in {0..256};do o=00$i;echo -e ${o:${#o}-3:3} `tput setaf $i;tput setab $i`${y// /=}$x;done;'
+
+### OS Specifics
+unamestr=`uname -a`
+if [[ "$unamestr" == *'Ubuntu'* ||  "$unamestr" == *'Debian'* ]]; then
+    alias i='sudo apt-get install'
+    alias is='sudo apt-cache search'
+    alias iu='sudo apt-get update'
+    alias iui='sudo apt-get update && sudo apt-get upgrade'
+elif [[ "$unamestr" == *'Fedora'* ]]; then
+    alias i='sudo yum install'
+    alias is='sudo yum search'
+    alias iu='sudo yum update'
+    alias iui='sudo yum upgrade'
+elif [[ "$unamestr" == *'Archlinux'* ]]; then
+    alias i='sudo pacman -S'
+    alias is='sudo pacman-Ss'
+    alias iu='sudo pacman -U'
+    alias iui='sudo pacman -Syu'
+fi
+
+############################################################
+#                        FUNCTIONS                         #
+############################################################
+
+function e
+{
+    emacs $1 &
+}
+
+function m
+{
+    mount ${@:1} | column -t
+}
+
+function s
+{
+  grep --color=auto -RIni "$@" . 2> /dev/null
+}
+
+function se
+{
+    sudo ${EDITOR} $1 &
+}
+
+function ownit
+{
+    sudo chown -R $USER:$USER $1 && sudo chmod -R 755 $1
+}
+
+function dtn
+{
+    dmesg | tail -n $1
+}
+
 
 source $ZSH/oh-my-zsh.sh
-
 
 ############################################################
 #                        HISTORY                           #
@@ -210,73 +331,6 @@ zstyle :compinstall filename '~/.zshrc'
 fpath=(~/bin $fpath)
 autoload -U compinit
 compinit -u -i
-
-############################################################
-#                        FUNCTIONS                         #
-############################################################
-
-function e
-{
-    emacs $1 &
-}
-
-function m
-{
-    mount ${@:1} | column -t
-}
-
-function s
-{
-  grep --color=auto -RIni "$@" . 2> /dev/null
-}
-
-function se
-{
-    sudo ${EDITOR} $1 &
-}
-
-function ownit
-{
-    sudo chown -R $USER:$USER $1 && sudo chmod -R 755 $1
-}
-
-function dtn
-{
-    dmesg | tail -n $1
-}
-
-alias spectrum_ls='x=`tput op` y=`printf %$((${COLUMNS}-6))s`;for i in {0..256};do o=00$i;echo -e ${o:${#o}-3:3} `tput setaf $i;tput setab $i`${y// /=}$x;done;'
-
-
-############################################################
-#                         ALIASES                          #
-############################################################
-alias b='bat -p'
-alias df='df -h'
-alias dt='dmesg | tail -n 10'
-alias mkdir='mkdir -pv'
-alias path='echo -e ${PATH//:/\\n}'
-alias nowdate='date +"%d-%m-%Y - %T"'
-alias lg='lazygit'
-
-### OS Specifics
-unamestr=`uname -a`
-if [[ "$unamestr" == *'Ubuntu'* ||  "$unamestr" == *'Debian'* ]]; then
-    alias i='sudo apt-get install'
-    alias is='sudo apt-cache search'
-    alias iu='sudo apt-get update'
-    alias iui='sudo apt-get update && sudo apt-get upgrade'
-elif [[ "$unamestr" == *'Fedora'* ]]; then
-    alias i='sudo yum install'
-    alias is='sudo yum search'
-    alias iu='sudo yum update'
-    alias iui='sudo yum upgrade'
-elif [[ "$unamestr" == *'Archlinux'* ]]; then
-    alias i='sudo pacman -S'
-    alias is='sudo pacman-Ss'
-    alias iu='sudo pacman -U'
-    alias iui='sudo pacman -Syu'
-fi
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
