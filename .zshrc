@@ -212,6 +212,10 @@ function dtn
     dmesg | tail -n $1
 }
 
+function pupdate
+{
+    case ":${PATH:=$1}:" in *:"$1":*) ;; *) PATH="$1:$PATH" ;; esac;
+}
 
 source $ZSH/oh-my-zsh.sh
 
@@ -362,3 +366,4 @@ compinit -u -i
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+[[ ! -f ~/.local.zsh ]] || source ~/.local.zsh
