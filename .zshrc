@@ -81,7 +81,8 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
     alias-finder		# List and find aliases
-    cargo			    # Rust build tool
+    battery             # Kikoo prompt shit
+    brew                # Mac OS
     command-not-found	# List package to install to get this command
     common-aliases		# Classic aliases
     copybuffer			# Ctrl+o copies the current command line to the clipboard
@@ -98,7 +99,9 @@ plugins=(
     git				    # git aliases and autocompletion
     git-auto-fetch		# git-auto-fetch to disable/enable auto fetching in git folder
     git-prompt			# displays git prompt in shell
+    iterm2              # MacOS shit
     jsontools			# json command line tools
+    macos               # MacOS shit
     mosh			    # autocompletion for mosh
     nmap			    # aliases for classic nmap commands
     pep8			    # autocompletion for pep8
@@ -113,7 +116,6 @@ plugins=(
     ripgrep             # completion for rg
     rsync               # aliases for rsync
     rust                # completion for rustc compiler
-    rustup              # completion for rustup installer
     screen              # sets title and hardstatus for screen
     ssh-agent           # starts ssh-agent
     systemadmin         # aliases and functions 
@@ -122,7 +124,7 @@ plugins=(
     thefuck             # Esc-Esc corrects previous command
     tmux                # aliases for tmux
     tmuxinator          # completion for tmuxinator
-    ubuntu			    # Might want to change that in some cases
+    # ubuntu			    # Might want to change that in some cases
     ufw                 # completion for ufw
     virtualenv          # displays virtualenv in prompt
     vscode              # aliases for vscode
@@ -142,80 +144,9 @@ zstyle ':completion:*:*:docker:*' option-stacking yes
 zstyle ':completion:*:*:docker-*:*' option-stacking yes
 
 zstyle :omz:plugins:ssh-agent agent-forwarding on
-zstyle :omz:plugins:ssh-agent identities id_rsa id_ledger
+#zstyle :omz:plugins:ssh-agent identities id_rsa
 
 bindkey '^ ' autosuggest-accept
-
-############################################################
-#                         ALIASES                          #
-############################################################
-alias b='bat -p'
-alias df='df -h'
-alias dt='dmesg | tail -n 10'
-alias mkdir='mkdir -pv'
-alias path='echo -e ${PATH//:/\\n}'
-alias nowdate='date +"%d-%m-%Y - %T"'
-alias lg='lazygit'
-
-alias spectrum_ls='x=`tput op` y=`printf %$((${COLUMNS}-6))s`;for i in {0..256};do o=00$i;echo -e ${o:${#o}-3:3} `tput setaf $i;tput setab $i`${y// /=}$x;done;'
-
-### OS Specifics
-unamestr=`uname -a`
-if [[ "$unamestr" == *'Ubuntu'* ||  "$unamestr" == *'Debian'* ]]; then
-    alias i='sudo apt-get install'
-    alias is='sudo apt-cache search'
-    alias iu='sudo apt-get update'
-    alias iui='sudo apt-get update && sudo apt-get upgrade'
-elif [[ "$unamestr" == *'Fedora'* ]]; then
-    alias i='sudo yum install'
-    alias is='sudo yum search'
-    alias iu='sudo yum update'
-    alias iui='sudo yum upgrade'
-elif [[ "$unamestr" == *'Archlinux'* ]]; then
-    alias i='sudo pacman -S'
-    alias is='sudo pacman-Ss'
-    alias iu='sudo pacman -U'
-    alias iui='sudo pacman -Syu'
-fi
-
-############################################################
-#                        FUNCTIONS                         #
-############################################################
-
-function e
-{
-    emacs $1 &
-}
-
-function m
-{
-    mount ${@:1} | column -t
-}
-
-function s
-{
-  grep --color=auto -RIni "$@" . 2> /dev/null
-}
-
-function se
-{
-    sudo ${EDITOR} $1 &
-}
-
-function ownit
-{
-    sudo chown -R $USER:$USER $1 && sudo chmod -R 755 $1
-}
-
-function dtn
-{
-    dmesg | tail -n $1
-}
-
-function pupdate
-{
-    case ":${PATH:=$1}:" in *:"$1":*) ;; *) PATH="$1:$PATH" ;; esac;
-}
 
 source $ZSH/oh-my-zsh.sh
 
@@ -243,7 +174,8 @@ export BAT_PAGER="less -RF"
 xset b off &> /dev/null
 xset r rate 300 100 &> /dev/null
 umask 022
-eval $( dircolors -b $HOME/.dir_colors )
+#Todo if Macos
+#eval $( dircolors -b $HOME/.dir_colors )
 
 ############################################################
 #                      ZSH OPTIONS                         #
@@ -367,3 +299,79 @@ compinit -u -i
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 [[ ! -f ~/.local.zsh ]] || source ~/.local.zsh
+
+############################################################
+#                       ALIASES                             #
+############################################################
+alias b='bat -p'
+alias df='df -h'
+alias dt='dmesg | tail -n 10'
+alias mkdir='mkdir -pv'
+alias path='echo -e ${PATH//:/\\n}'
+alias nowdate='date +"%d-%m-%Y - %T"'
+alias lg='lazygit'
+alias sshkeycp='cat ~/.ssh/id_rsa.pub | tee >(pbcopy)'
+alias gitabort='git clean -fd && git reset --hard HEAD'
+alias bgd='git diff --name-only --diff-filter=d | xargs bat --diff'
+alias bgs='git show v'
+alias ls='exa'
+alias spectrum_ls='x=`tput op` y=`printf %$((${COLUMNS}-6))s`;for i in {0..256};do o=00$i;echo -e ${o:${#o}-3:3} `tput setaf $i;tput setab $i`${y// /=}$x;done;'
+
+unalias duf 
+
+### OS Specifics
+unamestr=`uname -a`
+if [[ "$unamestr" == *'Ubuntu'* ||  "$unamestr" == *'Debian'* ]]; then
+    alias i='sudo apt-get install'
+    alias is='sudo apt-cache search'
+    alias iu='sudo apt-get update'
+    alias iui='sudo apt-get update && sudo apt-get upgrade'
+elif [[ "$unamestr" == *'Fedora'* ]]; then
+    alias i='sudo yum install'
+    alias is='sudo yum search'
+    alias iu='sudo yum update'
+    alias iui='sudo yum upgrade'
+elif [[ "$unamestr" == *'Archlinux'* ]]; then
+    alias i='sudo pacman -S'
+    alias is='sudo pacman-Ss'
+    alias iu='sudo pacman -U'
+    alias iui='sudo pacman -Syu'
+fi
+
+############################################################
+#                        FUNCTIONS                         #
+############################################################
+
+function e {
+    ${EDITOR} $1 &
+}
+
+function dsf {
+    diff -u $1 $2 | diff-so-fancy
+}
+
+function m {
+    mount ${@:1} | column -t
+}
+
+function s {
+  grep --color=auto -RIni "$@" . 2> /dev/null
+}
+
+function se {
+    sudo ${EDITOR} $1 &
+}
+
+function ownit {
+    sudo chown -R $USER:$USER $1 && sudo chmod -R 755 $1
+}
+
+function dtn {
+    dmesg | tail -n $1
+}
+
+function pupdate {
+    case ":${PATH:=$1}:" in *:"$1":*) ;; *) PATH="$1:$PATH" ;; esac;
+}
+
+source /Users/d34db33f/.config/broot/launcher/bash/br
