@@ -86,7 +86,7 @@ plugins=(
     command-not-found	# List package to install to get this command
     common-aliases		# Classic aliases
     copybuffer			# Ctrl+o copies the current command line to the clipboard
-    copydir			    # typing copydir copies the current folder to the clipboard
+    copypath			    # typing copypath copies the current folder to the clipboard
     copyfile			# copyfile <filename> copies the contents of the file to the clipboard
     dircycle			# Ctrl + Shift + Left / Right cycles through popd/pushd 
     docker			    # autocompletion for docker
