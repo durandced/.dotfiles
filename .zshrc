@@ -374,4 +374,12 @@ function pupdate {
     case ":${PATH:=$1}:" in *:"$1":*) ;; *) PATH="$1:$PATH" ;; esac;
 }
 
-source /Users/d34db33f/.config/broot/launcher/bash/br
+function cpln {
+    origin="${1%/}"     #first argument without a trailing / if already present
+    base=$(basename $1)
+    dest="${2%/}/"      #second argument with a trailing / if not already present
+    printf "mv $origin $dest && ln -s $dest$base $origin"
+    {mv $origin $dest && ln -s $dest$base $origin }& 
+}
+
+source $HOME/.zsh_custom
