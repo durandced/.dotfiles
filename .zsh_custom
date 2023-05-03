@@ -1,2 +1,61 @@
+# PATH MAC OS
+pupdate /opt/homebrew/opt/go@1.16/bin
 pupdate /home/linuxbrew/.linuxbrew/bin
-pupdate ~/.local/bin
+pupdate /opt/X11/bin
+pupdate /Applications/STMicroelectronics/STM32Cube/STM32CubeProgrammer/STM32CubeProgrammer.app/Contents/MacOs/bin
+pupdate /opt/homebrew/opt/llvm/bin
+pupdate $(brew --prefix gnu-getopt)/bin
+export DISPLAY=:0
+
+# GOLANG DEV
+export GOPATH=$HOME/go
+export GOROOT="$(brew --prefix go@1.16)/libexec"
+pupdate ${GOPATH}/bin:${GOROOT}/bin
+
+#Arm Toolchain
+pupdate /Applications/ARM/bin 
+
+#SmartD
+export ZEPHYR_SDK_INSTALL_DIR=/opt/nordic/ncs/toolchains/v2.1.2/opt/zephyr-sdk
+export SMARTDRIVE_IP=10.58.1.60
+export SMARTDRIVE_URL=$SMARTDRIVE_IP:8080
+export SMARTDRIVE_SERIAL=0000-20211026-000060
+export SMARTD_PROTOSET=/Users/cdurand/Documents/Code/SmartD/VFD_IoT/lib/smartd_api/generated/protoset/smartd_api.protoset
+iot-auth() {
+    (
+        set -o errexit
+        set -o nounset
+        set -o pipefail
+        # set -o xtrace
+
+        # read -rs password
+        local -r password="$SMARTDRIVE_SERIAL"
+        local auth_config="{
+                \"username\": \"admin\",
+                \"password\": \"$password\"
+            }"
+
+        local key
+        key=$(grpcurl --plaintext \
+            -protoset "$SMARTD_PROTOSET" \
+            -d "${auth_config}" \
+            "$SMARTDRIVE_URL" \
+            smartd_api.v1.Auth/UserLogin | jq '. | .accessToken')
+        key="${key%\"}"
+        key="${key#\"}"
+
+        local auth_token
+        auth_token="Bearer ${key}"
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            echo "$auth_token" | pbcopy
+        else
+            echo "$auth_token" | xclip -sel clip
+        fi
+        echo "$auth_token"
+    )
+}
+
+export ANDROID_HOME=~/Library/Android/sdk/
+export ANDROID_SDK_ROOT=~/Library/Android/sdk
+pupdate $ANDROID_SDK_ROOT/emulator
+pupdate $ANDROID_SDK_ROOT/platform-tools

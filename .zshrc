@@ -225,8 +225,12 @@ unsetopt GLOBAL_RCS
 
 bindkey '^[[1;5A' history-search-backward # Ctrl-Up search what's typed before
 bindkey '^[[1;5B' history-search-forward # Cycle back on history search
-bindkey '^[[1;5C' emacs-forward-word # Ctrl-Right moves to next delimiter
-bindkey '^[[1;5D' emacs-backward-word # Ctrl-Left moves to previous delimiter
+#bindkey '^[[1;5C' emacs-forward-word # Ctrl-Right moves to next delimiter
+#bindkey '^[[1;5D' emacs-backward-word # Ctrl-Left moves to previous delimiter
+#bindkey '^[[5C' emacs-forward-word # Ctrl-Left moves to previous delimiter
+#bindkey '[C' emacs-forward-word # Ctrl-Left moves to previous delimiter
+#bindkey '[D' emacs-backward-word # Ctrl-Left moves to previous delimiter
+#bindkey '^[[5D' emacs-backward-word # Ctrl-Left moves to previous delimiter
 bindkey '^[[3;5~' kill-word # Ctrl-Suppr Cut forward to next delimiter
 bindkey '^H' backward-delete-word # Ctrl-Backspaces does Ctrl-W, Cut backward to next delimiter
 # Ctrl-Y Pastes what's been cut
@@ -316,8 +320,13 @@ alias bgd='git diff --name-only --diff-filter=d | xargs bat --diff'
 alias bgs='git show v'
 alias ls='exa'
 alias spectrum_ls='x=`tput op` y=`printf %$((${COLUMNS}-6))s`;for i in {0..256};do o=00$i;echo -e ${o:${#o}-3:3} `tput setaf $i;tput setab $i`${y// /=}$x;done;'
-
-unalias duf 
+alias gsuir='gsu --init --recursive'
+alias gsuirf='gsuir --force'
+alias rcp='rsync-copy'
+alias rmv='rsync-move'
+alias rsc='rsync-synchronize'
+alias rup='rsync-update'
+alias la='exa -laFh'
 
 ### OS Specifics
 unamestr=`uname -a`
@@ -381,5 +390,14 @@ function cpln {
     printf "mv $origin $dest && ln -s $dest$base $origin"
     {mv $origin $dest && ln -s $dest$base $origin }& 
 }
-
 source $HOME/.zsh_custom
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
