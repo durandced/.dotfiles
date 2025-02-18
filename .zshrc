@@ -10,9 +10,7 @@ fi
 
 # Path to your oh-my-zsh installation.
 export ZSH="${HOME}/.oh-my-zsh"
-COMPLETION_WAITING_DOTS="true"
 BAR_COLOR=039
-export WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -36,10 +34,10 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # DISABLE_AUTO_UPDATE="true"
 
 # Uncomment the following line to automatically update without prompting.
-# DISABLE_UPDATE_PROMPT="true"
+DISABLE_UPDATE_PROMPT="true"
 
 # Uncomment the following line to change how often to auto-update (in days).
-# export UPDATE_ZSH_DAYS=13
+export UPDATE_ZSH_DAYS=1
 
 # Uncomment the following line if pasting URLs and other text is messed up.
 # DISABLE_MAGIC_FUNCTIONS="true"
@@ -56,7 +54,7 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Uncomment the following line to display red dots whilst waiting for completion.
 # Caution: this setting can cause issues with multiline prompts (zsh 5.7.1 and newer seem to work)
 # See https://github.com/ohmyzsh/ohmyzsh/issues/5765
-# COMPLETION_WAITING_DOTS="true"
+COMPLETION_WAITING_DOTS="true"
 
 # Uncomment the following line if you want to disable marking untracked files
 # under VCS as dirty. This makes repository status check for large repositories
@@ -81,6 +79,7 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
     alias-finder		# List and find aliases
+    aws                 # aws prompt
     battery             # Kikoo prompt shit
     brew                # Mac OS
     command-not-found	# List package to install to get this command
@@ -88,17 +87,19 @@ plugins=(
     copybuffer			# Ctrl+o copies the current command line to the clipboard
     copypath			    # typing copypath copies the current folder to the clipboard
     copyfile			# copyfile <filename> copies the contents of the file to the clipboard
-    dircycle			# Ctrl + Shift + Left / Right cycles through popd/pushd 
+    dircycle			# Ctrl + Shift + Left / Right cycles through popd/pushd
     docker			    # autocompletion for docker
     docker-compose		# aliases for docker-compose
     # emacs			    # aliases for emacsclient
     extract			    # wrapper for all file extractions
-    fd				    # autocompletion for fd
+    eza                 # better ls alternative
+    # fd				# autocompletion for fd
     fzf				    # fuzzy auto-completion
     gh				    # autocompletion for github cli
     git				    # git aliases and autocompletion
     git-auto-fetch		# git-auto-fetch to disable/enable auto fetching in git folder
     git-prompt			# displays git prompt in shell
+    golang              # go aliases
     iterm2              # MacOS shit
     jsontools			# json command line tools
     macos               # MacOS shit
@@ -107,18 +108,18 @@ plugins=(
     pep8			    # autocompletion for pep8
     # per-directory-history	# Ctrl+G to switch history. To check if compatible with fzf
     pip				    # completion for pip + aliases
-    pipenv			    # completion and aliases for pipenv
-    # pyenv			    # loads pyenv if found
+    # pipenv			    # completion and aliases for pipenv
+    pyenv			    # loads pyenv if found
     pylint			    # completion and aliases for pylinbt
     python			    # aliases for python
     # redis-cli		    # completion for redis
     repo			    # completion and aliases for repo
-    ripgrep             # completion for rg
+    # ripgrep             # completion for rg
     rsync               # aliases for rsync
     rust                # completion for rustc compiler
     screen              # sets title and hardstatus for screen
     ssh-agent           # starts ssh-agent
-    systemadmin         # aliases and functions 
+    systemadmin         # aliases and functions
     systemd             # aliases for systemd
     taskwarrior         # completion for taskwarrior
     thefuck             # Esc-Esc corrects previous command
@@ -131,14 +132,30 @@ plugins=(
     wd                  # warp directory
     web-search          # search shit directly from command line
     zsh-autosuggestions
+    zsh-completions
+    zsh-syntax-highlighting
 )
+
+
+############################################################
+#                    PLUGINS CONFIG                        #
+############################################################
+# pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init --path)"
 
 ############################################################
 #                 PLUGIN-BASED ALIASES                     #
 ############################################################
+source $ZSH/oh-my-zsh.sh
 
 ZSH_ALIAS_FINDER_AUTOMATIC=true
 alias a='alias-finder -l'
+zstyle ':omz:plugins:alias-finder' autoload yes # disabled by default
+# zstyle ':omz:plugins:alias-finder' longer yes # disabled by default
+zstyle ':omz:plugins:alias-finder' exact yes # disabled by default
+# zstyle ':omz:plugins:alias-finder' cheaper yes # disabled by default
 
 zstyle ':completion:*:*:docker:*' option-stacking yes
 zstyle ':completion:*:*:docker-*:*' option-stacking yes
@@ -146,28 +163,36 @@ zstyle ':completion:*:*:docker-*:*' option-stacking yes
 zstyle :omz:plugins:ssh-agent agent-forwarding on
 #zstyle :omz:plugins:ssh-agent identities id_rsa
 
+# only aws command completion
+#zstyle ':completion:*:*:aws' fzf-search-display true
+zstyle ':completion:*' fzf-search-display true
 bindkey '^ ' autosuggest-accept
 
-source $ZSH/oh-my-zsh.sh
+export WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
+
+#vscode
+alias vscra='code --reuse-window --add'
+alias vscrd='code --reuse-window --diff'
+alias vsdiff=vscrd
+alias vscrg='code --reuse-window --goto'
 
 ############################################################
 #                        HISTORY                           #
 ############################################################
-HISTSIZE=50000
-SAVEHIST=50000
+HISTSIZE=500000
+SAVEHIST=500000
 HISTFILE=~/.zsh_history
 
 ############################################################
 #                      MISC / PERSO                        #
 ############################################################
-export EDITOR='emacs' # ftw
+export EDITOR='code'
 export LOGCHECK='60' # check new user logs every 60 seconds
 export MAILCHECK=0
 export PAGER='most'
 export WATCH='all'
 export SHELL='/bin/zsh'
 export TERM='xterm-256color'
-export SVN_EDITOR='emacs -nw'
 export NO_AT_BRIDGE=1 # remove GTK fucking warnings
 export BAT_PAGER="less -RF"
 
@@ -225,8 +250,12 @@ unsetopt GLOBAL_RCS
 
 bindkey '^[[1;5A' history-search-backward # Ctrl-Up search what's typed before
 bindkey '^[[1;5B' history-search-forward # Cycle back on history search
-bindkey '^[[1;5C' emacs-forward-word # Ctrl-Right moves to next delimiter
-bindkey '^[[1;5D' emacs-backward-word # Ctrl-Left moves to previous delimiter
+#bindkey '^[[1;5C' emacs-forward-word # Ctrl-Right moves to next delimiter
+#bindkey '^[[1;5D' emacs-backward-word # Ctrl-Left moves to previous delimiter
+#bindkey '^[[5C' emacs-forward-word # Ctrl-Left moves to previous delimiter
+#bindkey '[C' emacs-forward-word # Ctrl-Left moves to previous delimiter
+#bindkey '[D' emacs-backward-word # Ctrl-Left moves to previous delimiter
+#bindkey '^[[5D' emacs-backward-word # Ctrl-Left moves to previous delimiter
 bindkey '^[[3;5~' kill-word # Ctrl-Suppr Cut forward to next delimiter
 bindkey '^H' backward-delete-word # Ctrl-Backspaces does Ctrl-W, Cut backward to next delimiter
 # Ctrl-Y Pastes what's been cut
@@ -242,28 +271,28 @@ bindkey '^x^e' edit-command-line
 ############################################################
 #                        COMPLETION                        #
 ############################################################
-zstyle ':completion:*' verbose yes
-zstyle ':completion:*' format "%B---- %d%b ----=34"
-zstyle ':completion:*:descriptions'format $'%{\e[0;31m%}completing %B%d%b%{\e[0m%}'
-zstyle ':completion:*:messages' format '%B%U---- %d%u%b'
-zstyle ':completion:*:warnings' format "%B$fg[red]%}---- no match for: $fg[white]%d%b"
-zstyle ':completion:*' matcher-list '' 'm:{a-z}={A-Z}'
-zstyle ':completion:*' use-compctl false
-zstyle ':completion:*' completer _complete _approximate
-zstyle ':completion:*' completions 1
-zstyle ':completion:*' glob 1
-zstyle ':completion:*' group-name ''
-zstyle ':completion:*' insert-unambiguous false
-#zstyle ':completion:*:options' list-colors '=^(-- *)=34'
-zstyle ':completion:*:options' list-colors ${(s.:.)LS_COLORS}
-zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-zstyle ':completion:*:approximate:*' max-errors 2
-zstyle ':completion:*' menu select=0
-zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
-zstyle ':completion:*:processes-names' command 'ps -e -o comm='
-zstyle ':completion:*:processes' command 'ps -au$USER'
-zstyle ':completion:*:*:kill:*' list-colors '=(#b) #([0-9]#)*( *[a-z])*=34=31=33'
-zstyle :compinstall filename '~/.zshrc'
+# zstyle ':completion:*' verbose yes
+# zstyle ':completion:*' format "%B---- %d%b ----=34"
+# zstyle ':completion:*:descriptions'format $'%{\e[0;31m%}completing %B%d%b%{\e[0m%}'
+# zstyle ':completion:*:messages' format '%B%U---- %d%u%b'
+# zstyle ':completion:*:warnings' format "%B$fg[red]%}---- no match for: $fg[white]%d%b"
+# zstyle ':completion:*' matcher-list '' 'm:{a-z}={A-Z}'
+# zstyle ':completion:*' use-compctl false
+# zstyle ':completion:*' completer _complete _approximate
+# zstyle ':completion:*' completions 1
+# zstyle ':completion:*' glob 1
+# zstyle ':completion:*' group-name ''
+# zstyle ':completion:*' insert-unambiguous false
+# zstyle ':completion:*:options' list-colors '=^(-- *)=34'
+# zstyle ':completion:*:options' list-colors ${(s.:.)LS_COLORS}
+# zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+# zstyle ':completion:*:approximate:*' max-errors 2
+# zstyle ':completion:*' menu select=0
+# zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
+# zstyle ':completion:*:processes-names' command 'ps -e -o comm='
+# zstyle ':completion:*:processes' command 'ps -au$USER'
+# zstyle ':completion:*:*:kill:*' list-colors '=(#b) #([0-9]#)*( *[a-z])*=34=31=33'
+# zstyle :compinstall filename '~/.zshrc'
 fpath=(~/bin $fpath)
 autoload -U compinit
 compinit -u -i
@@ -279,7 +308,7 @@ compinit -u -i
 
 # Preferred editor for local and remote sessions
 # if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
+#'
 # else
 #   export EDITOR='mvim'
 # fi
@@ -300,43 +329,28 @@ compinit -u -i
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 [[ ! -f ~/.local.zsh ]] || source ~/.local.zsh
 
+typeset -g POWERLEVEL9K_MULTILINE_FIRST_PROMPT_GAP_FOREGROUND=${BAR_COLOR}
+
 ############################################################
 #                       ALIASES                             #
 ############################################################
-alias b='bat -p'
+alias b='bat'
+alias bgd='git diff --name-only --diff-filter=d | xargs bat --diff'
 alias df='df -h'
 alias dt='dmesg | tail -n 10'
-alias mkdir='mkdir -pv'
+alias m='mkdir -pv'
 alias path='echo -e ${PATH//:/\\n}'
 alias nowdate='date +"%d-%m-%Y - %T"'
-alias lg='lazygit'
 alias sshkeycp='cat ~/.ssh/id_rsa.pub | tee >(pbcopy)'
 alias gitabort='git clean -fd && git reset --hard HEAD'
-alias bgd='git diff --name-only --diff-filter=d | xargs bat --diff'
-alias bgs='git show v'
-alias ls='exa'
 alias spectrum_ls='x=`tput op` y=`printf %$((${COLUMNS}-6))s`;for i in {0..256};do o=00$i;echo -e ${o:${#o}-3:3} `tput setaf $i;tput setab $i`${y// /=}$x;done;'
-
-unalias duf 
-
-### OS Specifics
-unamestr=`uname -a`
-if [[ "$unamestr" == *'Ubuntu'* ||  "$unamestr" == *'Debian'* ]]; then
-    alias i='sudo apt-get install'
-    alias is='sudo apt-cache search'
-    alias iu='sudo apt-get update'
-    alias iui='sudo apt-get update && sudo apt-get upgrade'
-elif [[ "$unamestr" == *'Fedora'* ]]; then
-    alias i='sudo yum install'
-    alias is='sudo yum search'
-    alias iu='sudo yum update'
-    alias iui='sudo yum upgrade'
-elif [[ "$unamestr" == *'Archlinux'* ]]; then
-    alias i='sudo pacman -S'
-    alias is='sudo pacman-Ss'
-    alias iu='sudo pacman -U'
-    alias iui='sudo pacman -Syu'
-fi
+alias gsuir='gsu --init --recursive'
+alias gsuirf='gsuir --force'
+alias gcsm='gcs -m'
+alias rcp='rsync-copy --no-o --no-g --no-perms'
+alias rmv='rsync-move'
+alias rsc='rsync-synchronize'
+alias rup='rsync-update'
 
 ############################################################
 #                        FUNCTIONS                         #
@@ -379,7 +393,16 @@ function cpln {
     base=$(basename $1)
     dest="${2%/}/"      #second argument with a trailing / if not already present
     printf "mv $origin $dest && ln -s $dest$base $origin"
-    {mv $origin $dest && ln -s $dest$base $origin }& 
+    {mv $origin $dest && ln -s $dest$base $origin }&
 }
-
 source $HOME/.zsh_custom
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"

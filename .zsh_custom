@@ -1,2 +1,23 @@
-pupdate /home/linuxbrew/.linuxbrew/bin
-pupdate ~/.local/bin
+source ~/.zsh_macos
+source ~/.zsh_smartd
+source ~/.zsh_passwords
+
+
+function _backward_kill_default_word() {
+  WORDCHARS='*?_-.[]~=/&;:!#$%^(){}<>' zle backward-kill-word
+}
+zle -N backward-kill-default-word _backward_kill_default_word
+bindkey '^X^_'  backward-kill-default-word  # Ctrl-Backspaces does Ctrl-W, Cut backward to next delimiter
+
+function _backward_full_word() {
+  WORDCHARS='*?_-.[]~=/&;:!#$%^(){}<>' zle emacs-backward-word
+}
+zle -N backward-full-word _backward_full_word
+bindkey '^[[1;6D' backward-full-word
+
+function _forward_full_word() {
+  WORDCHARS='*?_-.[]~=/&;:!#$%^(){}<>' zle emacs-forward-word
+}
+zle -N forward-full-word _forward_full_word
+bindkey '^[[1;6C' forward-full-word
+
